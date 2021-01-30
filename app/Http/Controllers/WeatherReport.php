@@ -7,6 +7,71 @@ use Illuminate\Support\Facades\Http;
 
 class WeatherReport extends Controller
 {
+    
+    public function index()
+    {
+        return view('ninecities');
+    }
+    public function fcity(Request $request)
+    {
+        $city = $request->fcity;
+        $data = Http::get('https://api.openweathermap.org/data/2.5/weather?q=' . $city . '&appid=3e0ef952b309e68bd3f0b4e003182d00')->json();
+        if ($data['cod'] == 404 || $data['cod'] == 400) {
+            $data['humidity'] = "";
+            $data['temp'] = "";
+            $data['weather'] = "";
+            return "<p> No city found in that name please check spelling</p>";
+        } else {
+            $weather = $data['weather'][0]['main'];
+            $humidity = $data['main']['humidity'];
+            $temp = $data['main']['temp'] - 273.15;
+            $data['humidity'] = $humidity;
+            $data['temp'] = $temp;
+            $data['weather'] = $weather;            
+            if ($data['weather'] == "Haze") {
+                $img = "https://www.accuweather.com/images/weathericons/4.svg";
+            }
+            if ($data['weather'] == "Clouds") {
+                $img = "https://www.accuweather.com/images/weathericons/07.svg";
+            }
+            if ($data['weather'] == "Clear") {
+                $img = "https://www.accuweather.com/images/weathericons/33.svg";
+            }
+            if ($data['weather'] == "") {
+                $img = "";
+            }
+            if ($data['weather'] == "Smoke") {
+                $img = "https://www.accuweather.com/images/weathericons/08.svg";
+            }
+            return '<div class="panel-heading">' . $city . ' | Temp <b>' . $data["temp"] . '</b> <a herf="http://google.com/search?q=how to get 1 lakh per month/" id="edit1">Edit</a></div>
+            <div class="panel-body">
+                <img src=' . $img . '>
+                <p><b>Weather : </b> ' . $data["weather"] . '</p>
+                <p><b>Humidity:</b>' . $data["humidity"] . '</p>
+            </div>';
+        }
+    }
+    public function city(Request $request)
+    {
+        $city = $request->city;
+        $data = Http::get('https://api.openweathermap.org/data/2.5/weather?q=' . $city . '&appid=3e0ef952b309e68bd3f0b4e003182d00')->json();
+        if ($data['cod'] == 404 || $data['cod'] == 400) {
+            $data['humidity'] = "";
+            $data['temp'] = "";
+            $data['weather'] = "";
+            $notfound = false;
+            return view('view', compact('data', 'city', 'notfound'));
+        } else {
+            $weather = $data['weather'][0]['main'];
+            $humidity = $data['main']['humidity'];
+            $temp = $data['main']['temp'] - 273.15;
+            $data['humidity'] = $humidity;
+            $data['temp'] = $temp;
+            $data['weather'] = $weather;
+            $notfound = true;
+            return view('view', compact('data', 'city', 'notfound'));
+        }
+    }
     public function ninecities()
     {
         $city1 = "New York";
@@ -83,68 +148,5 @@ class WeatherReport extends Controller
         $data9['weather'] = $weather9;
         return view('index', compact('data1', 'data2', 'data3', 'data4', 'data5', 'data6', 'data7', 'data8', 'data9'));
     }
-    public function city(Request $request)
-    {
-        $city = $request->city;
-        $data = Http::get('https://api.openweathermap.org/data/2.5/weather?q=' . $city . '&appid=3e0ef952b309e68bd3f0b4e003182d00')->json();
-        if ($data['cod'] == 404 || $data['cod'] == 400) {
-            $data['humidity'] = "";
-            $data['temp'] = "";
-            $data['weather'] = "";
-            $notfound = false;
-            return view('view', compact('data', 'city', 'notfound'));
-        } else {
-            $weather = $data['weather'][0]['main'];
-            $humidity = $data['main']['humidity'];
-            $temp = $data['main']['temp'] - 273.15;
-            $data['humidity'] = $humidity;
-            $data['temp'] = $temp;
-            $data['weather'] = $weather;
-            $notfound = true;
-            return view('view', compact('data', 'city', 'notfound'));
-        }
-    }
-    public function index()
-    {
-        return view('ninecities');
-    }
-    public function fcity(Request $request)
-    {
-        $city = $request->fcity;
-        $data = Http::get('https://api.openweathermap.org/data/2.5/weather?q=' . $city . '&appid=3e0ef952b309e68bd3f0b4e003182d00')->json();
-        if ($data['cod'] == 404 || $data['cod'] == 400) {
-            $data['humidity'] = "";
-            $data['temp'] = "";
-            $data['weather'] = "";
-            return "<p> No city found in that name please check spelling</p>";
-        } else {
-            $weather = $data['weather'][0]['main'];
-            $humidity = $data['main']['humidity'];
-            $temp = $data['main']['temp'] - 273.15;
-            $data['humidity'] = $humidity;
-            $data['temp'] = $temp;
-            $data['weather'] = $weather;            
-            if ($data['weather'] == "Haze") {
-                $img = "https://www.accuweather.com/images/weathericons/4.svg";
-            }
-            if ($data['weather'] == "Clouds") {
-                $img = "https://www.accuweather.com/images/weathericons/07.svg";
-            }
-            if ($data['weather'] == "Clear") {
-                $img = "https://www.accuweather.com/images/weathericons/33.svg";
-            }
-            if ($data['weather'] == "") {
-                $img = "";
-            }
-            if ($data['weather'] == "Smoke") {
-                $img = "https://www.accuweather.com/images/weathericons/08.svg";
-            }
-            return '<div class="panel-heading">' . $city . ' | Temp <b>' . $data["temp"] . '</b> <a herf="http://google.com/search?q=how to get 1 lakh per month/" id="edit1">Edit</a></div>
-            <div class="panel-body">
-                <img src=' . $img . '>
-                <p><b>Weather : </b> ' . $data["weather"] . '</p>
-                <p><b>Humidity:</b>' . $data["humidity"] . '</p>
-            </div>';
-        }
-    }
+    
 }
