@@ -20,3 +20,5 @@ use App\Http\Controllers\WeatherReport;
 
 Route::get('/', 'WeatherReport@index');
 Route::post('/city', 'WeatherReport@city');
+Route::post('/fcity', 'WeatherReport@fcity');
+Route::get('/ninecities','WeatherReport@ninecities');
